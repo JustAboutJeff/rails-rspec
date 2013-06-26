@@ -5,7 +5,7 @@ describe 'Admin' do
 
     before(:each) do
       @post = Post.new 
-      @post.title = "Abi ain't my Daddy"
+      @post.title = "Phase 3"
       @post.content = "Having it"
       @post.is_published = true
       @post.save
@@ -47,11 +47,19 @@ describe 'Admin' do
   end
 
   context "editing post" do
+
+    before(:each) do
+      @post = Post.new 
+      @post.title = "Phase 3"
+      @post.content = "Having it"
+      @post.is_published = true
+      @post.save
+      page.driver.browser.basic_authorize('geek', 'jock')
+    end
+
     it "can mark an existing post as unpublished" do
-      visit admin_posts_url
-      p page.html
-      click_link 'Edit'
-      uncheck('is_published')
+      visit edit_admin_post_url(@post)
+      uncheck('post_is_published')
       click_button 'Save'
 
       page.should have_content "Published: false"
@@ -59,8 +67,35 @@ describe 'Admin' do
   end
 
   context "on post show page" do
-    it "can visit a post show page by clicking the title"
-    it "can see an edit link that takes you to the edit post path"
-    it "change go to the admin homepage by clicking the Admin welcome page link"
+    before(:each) do
+      @post = Post.new 
+      @post.title = "Phase 3"
+      @post.content = "Having it"
+      @post.is_published = true
+      @post.save
+      page.driver.browser.basic_authorize('geek', 'jock')
+    end
+
+    # WTF: THIS TEST DOESN'T MAKE A LOT OF SENSE
+    # it "can visit a post show page by clicking the title" do
+      # pending
+    # end
+
+    it "can see an edit link that takes you to the edit post path" do
+      visit admin_post_url(@post)
+      expect(page).to have_content @post.title
+      expect(page).to have_content 'Edit post'
+      click_link 'Edit post'
+      expect(page).to have_content "Edit #{@post.title}"
+    end
+
+    it "change go to the admin homepage by clicking the Admin welcome page link" do
+      visit admin_post_url(@post)
+      expect(page).to have_content @post.title
+      expect(page).to have_content 'Edit post'
+      click_link 'Admin welcome page'
+      expect(page).to have_content "Welcome to the admin panel!"
+    end
+
   end
 end
